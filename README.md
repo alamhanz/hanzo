@@ -1,5 +1,6 @@
 # hanzo
 my experimental LLM project.
+This LLM project is using Together serverless model.
 
 
 ## Model Types

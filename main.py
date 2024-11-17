@@ -21,7 +21,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_together import TogetherEmbeddings
 
-from common import init_logger
+from src.common import init_logger
 
 init_logger(__name__)
 logger = logging.getLogger(__name__)
@@ -34,13 +34,12 @@ CHROMA_PATH = "temp/chroma_test/"
 # loader = TextLoader("temp/about_me.txt", encoding="windows-1252")
 # docs = loader.load()
 
-# text_splitter = RecursiveCharacterTextSplitter(chunk_size=50, chunk_overlap=10)
+# text_splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=25)
 # splits = text_splitter.split_documents(docs)
 
 # logger.info(len(splits))
+# logger.info(splits[:2])
 
-
-# # print(splits)
 embedding = TogetherEmbeddings(model="togethercomputer/m2-bert-80M-32k-retrieval")
 
 # logger.info("Start DB")
@@ -62,13 +61,24 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_together import Together
 
 # Configure prompt and retrieval chain
-retriever = db_load.as_retriever()
-template = "Given the context: {context} Answer the question: {question}"
+retriever = db_load.as_retriever(search_kwargs={"k": 5})
+template = "Short answer only, no explaination and Avoid repeated answer. Given the context: {context} Answer the question: {question}"
+# template = """
+#     You are an assistant answering specific questions about Alamsyah.
+#     Context: {context}
+#     Question: {question}
+#     Instructions:
+#     - Use only the information provided in the context to answer.
+#     - If the answer is not in the context, respond with "I don't know based on the provided information."
+#     - Avoid fabricating answers.
+# """
 prompt = ChatPromptTemplate.from_template(template=template)
 
 llm = Together(
     model="meta-llama/Meta-Llama-3-8B-Instruct-Turbo",
-    max_tokens=350,
+    max_tokens=300,
+    temperature=0.5,  # Adds randomness to outputs
+    top_p=0.5,  # Nucleus sampling for diverse responses
 )
 
 chain = (
