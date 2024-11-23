@@ -95,3 +95,6 @@ while ASKING:
     input_query = input("What is your question? ")
     output = chain.invoke(input_query)
     logger.info(output)
+
+
+# https://github.com/alamhanz/data_science_template/blob/master/%7B%7Bcookiecutter.repo_name%7D%7D/src/datamart.py
