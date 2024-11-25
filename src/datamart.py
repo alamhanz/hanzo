@@ -43,4 +43,3 @@ if __name__ == "__main__":
     download_file_from_gcs(bucket_name, source_blob_name, destination_file_name)
 
 # public-artifact/kaggle-data/child-mind-sleep-state/base-feat_eng-v0_test.parquet
-# GOOGLE_APPLICATION_CREDENTIALS="temp/hanz-downloader.json"
