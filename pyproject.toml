@@ -1,3 +1,9 @@
+[build-system]
+requires = [
+    "setuptools>=60",
+    "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "hanzo"
 version = "0.1.0"
@@ -28,11 +34,7 @@ readme = "README.md"
 keywords = ["LLM", "AI", "machine learning"]
 urls = {"Homepage" = "https://alamhanz.xyz"}
 
-[tool.setuptools.packages.find]
-where = ["hanzo"]
-
-[tool.pdm]
-distribution = false
-
-[tool.hatch.metadata]
-allow-direct-references = true
+[tool.setuptools]
+# If there are data files included in your packages that need to be
+# installed, specify them here.
+packages = ["hanzo"]
