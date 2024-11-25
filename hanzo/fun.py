@@ -18,8 +18,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # from langchain.prompts import PromptTemplate
 from langchain_together import Together, TogetherEmbeddings
-
-from hanzo.src.common import init_logger
+from src.common import init_logger
 
 init_logger("hanzo")
 logger = logging.getLogger("hanzo")
