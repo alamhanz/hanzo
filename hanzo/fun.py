@@ -18,7 +18,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # from langchain.prompts import PromptTemplate
 from langchain_together import Together, TogetherEmbeddings
-from src.common import init_logger
+
+from .src.common import init_logger
 
 init_logger("hanzo")
 logger = logging.getLogger("hanzo")
@@ -100,5 +101,6 @@ class talk:
         while ASKING:
             input_query = input("What is your question? ")
             output = self.chain.invoke(input_query)
+            logger.info(output)
             logger.info(output)
             logger.info(output)
