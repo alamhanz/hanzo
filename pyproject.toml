@@ -1,0 +1,18 @@
+[project]
+name = "hanzo"
+version = "0.1.0"
+description = "LLM Project testing"
+authors = [
+    {name="Alam Roman Leksutin", email="roman.leksutin@roms.inc"},
+]
+dependencies = [
+    ""
+]
+requires-python = ">=3.10.*"
+readme = "README.md"
+
+[tool.pdm]
+distribution = false
+
+[tool.hatch.metadata]
+allow-direct-references = true
