@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hanzo"
-version = "0.1.2"
+version = "0.2.0"
 description = "LLM Project testing"
 authors = [
     {name = "Alamsyah Hanza", email = "alamhanz@gmail.com"}
