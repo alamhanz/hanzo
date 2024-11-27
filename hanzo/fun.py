@@ -1,28 +1,28 @@
+import json
 import logging
 import os
 import sys
 
 import numpy as np
 from dotenv import load_dotenv
-from langchain import hub
-from langchain.chains import RetrievalQA
-from langchain.output_parsers import RegexParser
+from langchain.output_parsers.openai_functions import JsonOutputFunctionsParser
 
 # from langchain_community.vectorstores import Chroma
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import TextLoader
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # from langchain.prompts import PromptTemplate
-from langchain_together import Together, TogetherEmbeddings
+from langchain_together import ChatTogether, Together, TogetherEmbeddings
+from pydantic import BaseModel, Field
 
 from .src.common import init_logger
 
 init_logger("hanzo")
 logger = logging.getLogger("hanzo")
+# logger.setLevel("DEBUG")
 
 load_dotenv()
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
@@ -34,19 +34,19 @@ class vectordb:
 
     def __init__(
         self,
-        file=os.path.join(CURRENT_PATH, "temp", "about_me.txt"),
+        file=os.path.join(CURRENT_PATH, "..", "temp", "about_me.txt"),
         db_path=CHROMA_PATH,
         # model_name="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
-        model_name="togethercomputer/m2-bert-80M-32k-retrieval",
+        model="togethercomputer/m2-bert-80M-32k-retrieval",
     ):
         self.file = file
         self.loader = TextLoader(self.file, encoding="windows-1252")
         self.docs = self.loader.load()
         self.db_path = db_path
-        self.model_name = model_name
+        self.model = model
         self.embedding = TogetherEmbeddings(
             # model="togethercomputer/m2-bert-80M-32k-retrieval"
-            model=self.model_name
+            model=self.model
         )
 
     def create(self, chunk_size=150, chunk_overlap=30):
@@ -70,37 +70,60 @@ class vectordb:
         # results = db.similarity_search_with_relevance_scores(query_text, k=3)
 
 
-# print(results)
+class Hanz(BaseModel):
+    context: list = Field(description="list of context from human")
+    answer: str = Field(description="answer of the question given context")
 
 
 class talk:
-    def __init__(self, vdb):
+
+    def __init__(self, vdb, model="meta-llama/Meta-Llama-3-8B-Instruct-Turbo"):
         self.vectordb = vdb
         # Configure prompt and retrieval chain
         self.retriever = self.vectordb.as_retriever(search_kwargs={"k": 5})
-        self.template = "Short answer only, no explaination and Avoid repeated answer. Given the context: {context} Answer the question: {question}"
-        self.prompt = ChatPromptTemplate.from_template(template=self.template)
 
-        self.llm = Together(
-            model="meta-llama/Meta-Llama-3-8B-Instruct-Turbo",
+        ## single shot instead of conversation
+        self.template = "Given the context: {context}, Answer the question: {question}"
+        self.prompt = PromptTemplate(
+            template=self.template,
+            input_variables=["context", "question"],
+            # partial_variables={"format_instructions": format_output},
+        )
+
+        self.llm = ChatTogether(
+            model=model,
             max_tokens=300,
-            temperature=0.5,  # Adds randomness to outputs
-            top_p=0.5,  # Nucleus sampling for diverse responses
+            temperature=0.8,  # Adds randomness to outputs
+            top_p=0.7,  # Nucleus sampling for diverse responses
         )
 
         self.chain = (
             {"context": self.retriever, "question": RunnablePassthrough()}
             | self.prompt
-            | self.llm
-            | StrOutputParser()
+            | self.llm.with_structured_output(schema=Hanz)
         )
+        # | StrOutputParser()
 
     def invoking(self):
         logger.info("invoking")
         ASKING = True
         while ASKING:
-            input_query = input("What is your question? ")
-            output = self.chain.invoke(input_query)
-            logger.info(output)
-            logger.info(output)
-            logger.info(output)
+            input_query = input("What is your question? (type 'exit' to quit) ")
+            if input_query.lower() == "exit":
+                ASKING = False
+                print("Goodbye!")
+                break
+            try:
+                output = self.chain.invoke(input_query)
+                if output:
+                    output_json = json.loads(output.json())
+                    logger.debug(output_json["context"])
+                    logger.info(output_json["answer"])
+                else:
+                    logger.info("No Answer")
+            except Exception as e:
+                logger.error("Error during invocation: %s", e)
+
+
+# https://api.python.langchain.com/en/latest/together/chat_models/langchain_together.chat_models.ChatTogether.html
+# LLM may answer with question

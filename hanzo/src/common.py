@@ -28,7 +28,7 @@ def init_logger(module_name: str, suffix: str = ""):
     handler = logging.StreamHandler(sys.stdout)
     # Create a formatter for the logs
     formatter = colorlog.ColoredFormatter(
-        f"%(log_color)s%(levelname)-3s%(reset)s\t: %(asctime)s - %(module)s{suffix}\t- %(message)s",
+        f"%(log_color)s%(levelname)-3s%(reset)s\t: %(asctime)s - {module_name}-{suffix}\t- %(message)s",
         reset=True,
         log_colors={
             "DEBUG": "cyan",
