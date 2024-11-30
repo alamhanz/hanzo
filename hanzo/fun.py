@@ -104,25 +104,31 @@ class talk:
         )
         # | StrOutputParser()
 
-    def invoking(self):
+    def invoking(self, text_input=None):
         logger.info("invoking")
-        ASKING = True
-        while ASKING:
-            input_query = input("What is your question? (type 'exit' to quit) ")
-            if input_query.lower() == "exit":
-                ASKING = False
-                print("Goodbye!")
-                break
-            try:
-                output = self.chain.invoke(input_query)
-                if output:
-                    output_json = json.loads(output.json())
-                    logger.debug(output_json["context"])
-                    logger.info(output_json["answer"])
-                else:
-                    logger.info("No Answer")
-            except Exception as e:
-                logger.error("Error during invocation: %s", e)
+
+        if text_input:
+            output = self.chain.invoke(text_input)
+            output_json = json.loads(output.json())
+            return output_json
+        else:
+            ASKING = True
+            while ASKING:
+                input_query = input("What is your question? (type 'exit' to quit) ")
+                if input_query.lower() == "exit":
+                    ASKING = False
+                    print("Goodbye!")
+                    break
+                try:
+                    output = self.chain.invoke(input_query)
+                    if output:
+                        output_json = json.loads(output.json())
+                        logger.debug(output_json["context"])
+                        logger.info(output_json["answer"])
+                    else:
+                        logger.info("No Answer")
+                except Exception as e:
+                    logger.error("Error during invocation: %s", e)
 
 
 # https://api.python.langchain.com/en/latest/together/chat_models/langchain_together.chat_models.ChatTogether.html
