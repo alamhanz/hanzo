@@ -80,7 +80,7 @@ class talk:
     def __init__(self, vdb, model="meta-llama/Meta-Llama-3-8B-Instruct-Turbo"):
         self.vectordb = vdb
         # Configure prompt and retrieval chain
-        self.retriever = self.vectordb.as_retriever(search_kwargs={"k": 5})
+        self.retriever = self.vectordb.as_retriever(search_kwargs={"k": 10})
 
         ## single shot instead of conversation
         self.template = "Given the context: {context}, Answer the question: {question}"
@@ -90,9 +90,11 @@ class talk:
             # partial_variables={"format_instructions": format_output},
         )
 
+        ## Max Tokens impacting the retriever
+
         self.llm = ChatTogether(
             model=model,
-            max_tokens=300,
+            max_tokens=500,
             temperature=0.8,  # Adds randomness to outputs
             top_p=0.7,  # Nucleus sampling for diverse responses
         )
@@ -104,7 +106,7 @@ class talk:
         )
         # | StrOutputParser()
 
-    def invoking(self, text_input=None):
+    def invoking(self, text_input=None, verbose=False):
         logger.info("invoking")
 
         if text_input:
@@ -127,8 +129,11 @@ class talk:
                         logger.info(output_json["answer"])
                     else:
                         logger.info("No Answer")
+
+                    if verbose:
+                        logger.info("Real response: %s", output)
                 except Exception as e:
-                    logger.error("Error during invocation: %s", e)
+                    logger.info("I may not getting any context correctly: %s", e)
 
 
 # https://api.python.langchain.com/en/latest/together/chat_models/langchain_together.chat_models.ChatTogether.html
