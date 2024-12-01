@@ -110,9 +110,16 @@ class talk:
         logger.info("invoking")
 
         if text_input:
-            output = self.chain.invoke(text_input)
-            output_json = json.loads(output.json())
-            return output_json
+            try:
+                output = self.chain.invoke(text_input)
+                output_json = json.loads(output.json())
+                return output_json
+            except Exception as e:
+                logger.info(e)
+                return {
+                    "context": [],
+                    "answer": "I can't answer that for now. Try rephrase it.",
+                }
         else:
             ASKING = True
             while ASKING:
