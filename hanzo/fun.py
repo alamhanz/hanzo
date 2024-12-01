@@ -83,7 +83,7 @@ class talk:
         self.retriever = self.vectordb.as_retriever(search_kwargs={"k": 10})
 
         ## single shot instead of conversation
-        self.template = "Given the context: {context}, Answer the question: {question}"
+        self.template = "Given the context: {context}, Answer the following question with string one paragraph only (10 sentences maximum): {question}"
         self.prompt = PromptTemplate(
             template=self.template,
             input_variables=["context", "question"],
