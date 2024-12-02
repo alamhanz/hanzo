@@ -49,7 +49,7 @@ class vectordb:
             model=self.model
         )
 
-    def create(self, chunk_size=150, chunk_overlap=30):
+    def create(self, chunk_size=100, chunk_overlap=20):
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap
         )
@@ -77,13 +77,19 @@ class Hanz(BaseModel):
 
 class talk:
 
-    def __init__(self, vdb, model="meta-llama/Meta-Llama-3-8B-Instruct-Turbo"):
+    def __init__(
+        self,
+        vdb,
+        model="meta-llama/Meta-Llama-3-8B-Instruct-Turbo",
+        max_token=750,
+        context_size=8,
+    ):
         self.vectordb = vdb
         # Configure prompt and retrieval chain
-        self.retriever = self.vectordb.as_retriever(search_kwargs={"k": 10})
+        self.retriever = self.vectordb.as_retriever(search_kwargs={"k": context_size})
 
         ## single shot instead of conversation
-        self.template = "Given the context: {context}, Answer the following question with string one paragraph only (10 sentences maximum): {question}"
+        self.template = "Given the context only: {context}, Answer the following question with string one paragraph only (10 sentences maximum): {question}"
         self.prompt = PromptTemplate(
             template=self.template,
             input_variables=["context", "question"],
@@ -94,7 +100,7 @@ class talk:
 
         self.llm = ChatTogether(
             model=model,
-            max_tokens=500,
+            max_tokens=max_token,
             temperature=0.8,  # Adds randomness to outputs
             top_p=0.7,  # Nucleus sampling for diverse responses
         )
