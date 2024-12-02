@@ -71,8 +71,10 @@ class vectordb:
 
 
 class Hanz(BaseModel):
-    context: list = Field(description="list of context from human")
-    answer: str = Field(description="answer of the question given context")
+    context: list = Field(description="list of the context")
+    answer: str = Field(
+        description="summary of the answer whioch not more than 10 sentences maximum"
+    )
 
 
 class talk:
@@ -89,7 +91,7 @@ class talk:
         self.retriever = self.vectordb.as_retriever(search_kwargs={"k": context_size})
 
         ## single shot instead of conversation
-        self.template = "Given the context only: {context}, Answer the following question with string one paragraph only (10 sentences maximum): {question}"
+        self.template = "Given the context: {context}, Based on the context only, answer the following question with string one paragraph only: {question}. Let me know if you can't answer it because lack of context"
         self.prompt = PromptTemplate(
             template=self.template,
             input_variables=["context", "question"],
