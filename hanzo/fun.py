@@ -1,16 +1,14 @@
 import json
 import logging
 import os
-import sys
 
-import numpy as np
 from dotenv import load_dotenv
-from langchain.output_parsers.openai_functions import JsonOutputFunctionsParser
 
 # from langchain_community.vectorstores import Chroma
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import TextLoader
-from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -70,7 +68,7 @@ class vectordb:
         # results = db.similarity_search_with_relevance_scores(query_text, k=3)
 
 
-class Hanz(BaseModel):
+class Ragoutput(BaseModel):
     context: list = Field(description="list of the context")
     answer: str = Field(
         description="summary of the answer whioch not more than 10 sentences maximum"
@@ -91,15 +89,19 @@ class talk:
         self.retriever = self.vectordb.as_retriever(search_kwargs={"k": context_size})
 
         ## single shot instead of conversation
-        self.template = "Given the context: {context}, Based on the context only, answer the following question with string one paragraph only: {question}. Let me know if you can't answer it because lack of context"
-        self.prompt = PromptTemplate(
-            template=self.template,
+        self.ragtemplate = "Given the context: {context}, Based on the context only, answer the following question with string one paragraph only: {question}. Let me know if you can't answer it because lack of context"
+        self.ragprompt = PromptTemplate(
+            template=self.ragtemplate,
             input_variables=["context", "question"],
             # partial_variables={"format_instructions": format_output},
         )
 
-        ## Max Tokens impacting the retriever
+        self.streamtemplate = "You are an expert in Data and AI. Do Not Answer question other than about Data and AI, answer it within 1 sentence. If its about data and AI answer it with maximum 15 sentences in paragraph(s). Here is the question: {question}"
+        self.streamprompt = ChatPromptTemplate.from_template(
+            template=self.streamtemplate,
+        )
 
+        ## Max Tokens impacting the retriever
         self.llm = ChatTogether(
             model=model,
             max_tokens=max_token,
@@ -107,19 +109,25 @@ class talk:
             top_p=0.7,  # Nucleus sampling for diverse responses
         )
 
-        self.chain = (
+        self.ragchain = (
             {"context": self.retriever, "question": RunnablePassthrough()}
-            | self.prompt
-            | self.llm.with_structured_output(schema=Hanz)
+            | self.ragprompt
+            | self.llm.with_structured_output(schema=Ragoutput)
         )
-        # | StrOutputParser()
+
+        self.streamchain = (
+            {"question": RunnablePassthrough()}
+            | self.streamprompt
+            | self.llm
+            | StrOutputParser()
+        )
 
     def invoking(self, text_input=None, verbose=False):
         logger.info("invoking")
 
         if text_input:
             try:
-                output = self.chain.invoke(text_input)
+                output = self.ragchain.invoke(text_input)
                 output_json = json.loads(output.json())
                 return output_json
             except Exception as e:
@@ -137,7 +145,7 @@ class talk:
                     print("Goodbye!")
                     break
                 try:
-                    output = self.chain.invoke(input_query)
+                    output = self.ragchain.invoke(input_query)
                     if output:
                         output_json = json.loads(output.json())
                         logger.debug(output_json["context"])
@@ -149,6 +157,18 @@ class talk:
                         logger.info("Real response: %s", output)
                 except Exception as e:
                     logger.info("I may not getting any context correctly: %s", e)
+
+    def streaming(self):
+        ASKING = True
+        while ASKING:
+            input_query = input("\nWhat is your question? (type 'exit' to quit) ")
+            if input_query.lower() == "exit":
+                ASKING = False
+                print("Goodbye!")
+                break
+            else:
+                for m in self.streamchain.stream(input_query):
+                    print(m, end="", flush=True)
 
 
 # https://api.python.langchain.com/en/latest/together/chat_models/langchain_together.chat_models.ChatTogether.html
