@@ -79,14 +79,19 @@ class talk:
 
     def __init__(
         self,
-        vdb,
+        vdb=None,
         model="meta-llama/Meta-Llama-3-8B-Instruct-Turbo",
         max_token=750,
         context_size=8,
     ):
         self.vectordb = vdb
-        # Configure prompt and retrieval chain
-        self.retriever = self.vectordb.as_retriever(search_kwargs={"k": context_size})
+        if self.vectordb is not None:
+            # Configure prompt and retrieval chain
+            self.retriever = self.vectordb.as_retriever(
+                search_kwargs={"k": context_size}
+            )
+        else:
+            self.retriever = None
 
         ## single shot instead of conversation
         self.ragtemplate = "Given the context: {context}, Based on the context only, answer the following question with string one paragraph only: {question}. Let me know if you can't answer it because lack of context"
@@ -109,11 +114,12 @@ class talk:
             top_p=0.7,  # Nucleus sampling for diverse responses
         )
 
-        self.ragchain = (
-            {"context": self.retriever, "question": RunnablePassthrough()}
-            | self.ragprompt
-            | self.llm.with_structured_output(schema=Ragoutput)
-        )
+        if self.retriever is not None:
+            self.ragchain = (
+                {"context": self.retriever, "question": RunnablePassthrough()}
+                | self.ragprompt
+                | self.llm.with_structured_output(schema=Ragoutput)
+            )
 
         self.streamchain = (
             {"question": RunnablePassthrough()}
@@ -158,17 +164,21 @@ class talk:
                 except Exception as e:
                     logger.info("I may not getting any context correctly: %s", e)
 
-    def streaming(self):
-        ASKING = True
-        while ASKING:
-            input_query = input("\nWhat is your question? (type 'exit' to quit) ")
-            if input_query.lower() == "exit":
-                ASKING = False
-                print("Goodbye!")
-                break
-            else:
-                for m in self.streamchain.stream(input_query):
-                    print(m, end="", flush=True)
+    def streaming(self, input_query=None, stream=True):
+        if stream:
+            ASKING = True
+            while ASKING:
+                input_query = input("\nWhat is your question? (type 'exit' to quit) ")
+                if input_query.lower() == "exit":
+                    ASKING = False
+                    logger.info("Goodbye!")
+                    break
+                else:
+                    for m in self.streamchain.stream(input_query):
+                        print(m, end="", flush=True)
+        else:
+            answer = self.streamchain.stream(input_query)
+            return answer
 
 
 # https://api.python.langchain.com/en/latest/together/chat_models/langchain_together.chat_models.ChatTogether.html
