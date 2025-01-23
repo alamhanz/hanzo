@@ -225,7 +225,3 @@ class Talk:
 
         answer = self.streamchain.stream(input_query)
         return answer
-
-
-# https://api.python.langchain.com/en/latest/together/chat_models/langchain_together.chat_models.ChatTogether.html
-# LLM may answer with question
