@@ -15,7 +15,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # from langchain.prompts import PromptTemplate
-from langchain_together import ChatTogether, Together, TogetherEmbeddings
+from langchain_together import ChatTogether, TogetherEmbeddings
 from pydantic import BaseModel, Field
 
 from .src.common import init_logger
@@ -45,10 +45,7 @@ class Vectordb:
         self.docs = self.loader.load()
         self.db_path = db_path
         self.model = model
-        self.embedding = TogetherEmbeddings(
-            # model="togethercomputer/m2-bert-80M-32k-retrieval"
-            model=self.model
-        )
+        self.embedding = TogetherEmbeddings(model=self.model)
         self.db = None
 
     def create(self, chunk_size=100, chunk_overlap=20):
@@ -112,21 +109,21 @@ class Talk:
             self.retriever = None
 
         ## single shot instead of conversation
-        self.ragtemplate = """Given the context: {context}, 
+        ragtemplate = """Given the context: {context}, 
             Based on the context only, answer the following question with string one paragraph only: {question}. 
             Let me know if you can't answer it because lack of context"""
         self.ragprompt = PromptTemplate(
-            template=self.ragtemplate,
+            template=ragtemplate,
             input_variables=["context", "question"],
             # partial_variables={"format_instructions": format_output},
         )
 
-        self.streamtemplate = """You are an expert in Data and AI.
+        streamtemplate = """You are an expert in Data and AI.
             Do Not Answer question other than about Data and AI, answer it within 1 sentence. 
             If its about data and AI answer it with maximum 15 sentences in paragraph(s). 
             Here is the question: {question}"""
         self.streamprompt = ChatPromptTemplate.from_template(
-            template=self.streamtemplate,
+            template=streamtemplate,
         )
 
         ## Max Tokens impacting the retriever
