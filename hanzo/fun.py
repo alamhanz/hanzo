@@ -172,11 +172,11 @@ class Talk:
                     "answer": "I can't answer that for now. Try rephrase it.",
                 }
         else:
-            ASKING = True
-            while ASKING:
+            asking_hanzo = True
+            while asking_hanzo:
                 input_query = input("What is your question? (type 'exit' to quit) ")
                 if input_query.lower() == "exit":
-                    ASKING = False
+                    asking_hanzo = False
                     print("Goodbye!")
                     break
                 try:
@@ -205,11 +205,11 @@ class Talk:
         """
         answer = ""
         if stream:
-            ASKING = True
-            while ASKING:
+            asking_hanzo = True
+            while asking_hanzo:
                 input_query = input("\nWhat is your question? (type 'exit' to quit) ")
                 if input_query.lower() == "exit":
-                    ASKING = False
+                    asking_hanzo = False
                     logger.info("Goodbye!")
                     break
                 for m in self.streamchain.stream(input_query):
