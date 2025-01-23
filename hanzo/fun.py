@@ -109,7 +109,7 @@ class Talk:
             self.retriever = None
 
         ## single shot instead of conversation
-        ragtemplate = """Given the context: {context}, 
+        ragtemplate = """Given the context: {context},
             Based on the context only, answer the following question with string one paragraph only: {question}. 
             Let me know if you can't answer it because lack of context"""
         self.ragprompt = PromptTemplate(
@@ -192,6 +192,7 @@ class Talk:
                         logger.info("Real response: %s", output)
                 except ReferenceError as e:
                     logger.info("I may not getting any context correctly: %s", e)
+            return {}
 
     def streaming(self, input_query=None, stream=True):
         """_summary_
