@@ -140,6 +140,8 @@ class Talk:
                 | self.ragprompt
                 | self.llm.with_structured_output(schema=Ragoutput)
             )
+        else:
+            self.ragchain = None
 
         self.streamchain = (
             {"question": RunnablePassthrough()}
@@ -160,39 +162,43 @@ class Talk:
         """
         logger.info("invoking")
 
-        if text_input:
-            try:
-                output = self.ragchain.invoke(text_input)
-                output_json = json.loads(output.json())
-                return output_json
-            except NotImplementedError as e:
-                logger.info(e)
-                return {
-                    "context": [],
-                    "answer": "I can't answer that for now. Try rephrase it.",
-                }
-        else:
-            asking_hanzo = True
-            while asking_hanzo:
-                input_query = input("What is your question? (type 'exit' to quit) ")
-                if input_query.lower() == "exit":
-                    asking_hanzo = False
-                    print("Goodbye!")
-                    break
+        if self.ragchain:
+            if text_input:
                 try:
-                    output = self.ragchain.invoke(input_query)
-                    if output:
-                        output_json = json.loads(output.json())
-                        logger.debug(output_json["context"])
-                        logger.info(output_json["answer"])
-                    else:
-                        logger.info("No Answer")
+                    output = self.ragchain.invoke(text_input)
+                    output_json = json.loads(output.json())
+                    return output_json
+                except NotImplementedError as e:
+                    logger.info(e)
+                    return {
+                        "context": [],
+                        "answer": "I can't answer that for now. Try rephrase it.",
+                    }
+            else:
+                asking_hanzo = True
+                while asking_hanzo:
+                    input_query = input("What is your question? (type 'exit' to quit) ")
+                    if input_query.lower() == "exit":
+                        asking_hanzo = False
+                        print("Goodbye!")
+                        break
+                    try:
+                        output = self.ragchain.invoke(input_query)
+                        if output:
+                            output_json = json.loads(output.json())
+                            logger.debug(output_json["context"])
+                            logger.info(output_json["answer"])
+                        else:
+                            logger.info("No Answer")
 
-                    if verbose:
-                        logger.info("Real response: %s", output)
-                except ReferenceError as e:
-                    logger.info("I may not getting any context correctly: %s", e)
-            return {}
+                        if verbose:
+                            logger.info("Real response: %s", output)
+                    except ReferenceError as e:
+                        logger.info("I may not getting any context correctly: %s", e)
+                return {}
+
+        logger.warning("the vector db is not being setup.")
+        return {}
 
     def streaming(self, input_query=None, stream=True):
         """_summary_
