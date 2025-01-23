@@ -1,3 +1,5 @@
+"""Main Module"""
+
 import json
 import logging
 import os
@@ -28,7 +30,8 @@ CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 CHROMA_PATH = os.path.join(CURRENT_PATH, "temp", "chroma_db")
 
 
-class vectordb:
+class Vectordb:
+    """vectordb class"""
 
     def __init__(
         self,
@@ -46,8 +49,15 @@ class vectordb:
             # model="togethercomputer/m2-bert-80M-32k-retrieval"
             model=self.model
         )
+        self.db = None
 
     def create(self, chunk_size=100, chunk_overlap=20):
+        """create vectordb
+
+        Args:
+            chunk_size (int, optional): _description_. Defaults to 100.
+            chunk_overlap (int, optional): _description_. Defaults to 20.
+        """
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap
         )
@@ -60,6 +70,7 @@ class vectordb:
         )
 
     def load(self):
+        """load existing db"""
         logger.info("Load_DB")
         self.db = Chroma(
             persist_directory=self.db_path, embedding_function=self.embedding
@@ -69,13 +80,20 @@ class vectordb:
 
 
 class Ragoutput(BaseModel):
+    """RAG Styles
+
+    Args:
+        BaseModel (_type_): _description_
+    """
+
     context: list = Field(description="list of the context")
     answer: str = Field(
         description="summary of the answer whioch not more than 10 sentences maximum"
     )
 
 
-class talk:
+class Talk:
+    """AI Talk"""
 
     def __init__(
         self,
@@ -94,14 +112,19 @@ class talk:
             self.retriever = None
 
         ## single shot instead of conversation
-        self.ragtemplate = "Given the context: {context}, Based on the context only, answer the following question with string one paragraph only: {question}. Let me know if you can't answer it because lack of context"
+        self.ragtemplate = """Given the context: {context}, 
+            Based on the context only, answer the following question with string one paragraph only: {question}. 
+            Let me know if you can't answer it because lack of context"""
         self.ragprompt = PromptTemplate(
             template=self.ragtemplate,
             input_variables=["context", "question"],
             # partial_variables={"format_instructions": format_output},
         )
 
-        self.streamtemplate = "You are an expert in Data and AI. Do Not Answer question other than about Data and AI, answer it within 1 sentence. If its about data and AI answer it with maximum 15 sentences in paragraph(s). Here is the question: {question}"
+        self.streamtemplate = """You are an expert in Data and AI.
+            Do Not Answer question other than about Data and AI, answer it within 1 sentence. 
+            If its about data and AI answer it with maximum 15 sentences in paragraph(s). 
+            Here is the question: {question}"""
         self.streamprompt = ChatPromptTemplate.from_template(
             template=self.streamtemplate,
         )
@@ -129,6 +152,15 @@ class talk:
         )
 
     def invoking(self, text_input=None, verbose=False):
+        """_summary_
+
+        Args:
+            text_input (_type_, optional): _description_. Defaults to None.
+            verbose (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            _type_: _description_
+        """
         logger.info("invoking")
 
         if text_input:
@@ -136,7 +168,7 @@ class talk:
                 output = self.ragchain.invoke(text_input)
                 output_json = json.loads(output.json())
                 return output_json
-            except Exception as e:
+            except NotImplementedError as e:
                 logger.info(e)
                 return {
                     "context": [],
@@ -161,10 +193,20 @@ class talk:
 
                     if verbose:
                         logger.info("Real response: %s", output)
-                except Exception as e:
+                except ReferenceError as e:
                     logger.info("I may not getting any context correctly: %s", e)
 
     def streaming(self, input_query=None, stream=True):
+        """_summary_
+
+        Args:
+            input_query (_type_, optional): _description_. Defaults to None.
+            stream (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            _type_: _description_
+        """
+        answer = ""
         if stream:
             ASKING = True
             while ASKING:
@@ -173,12 +215,12 @@ class talk:
                     ASKING = False
                     logger.info("Goodbye!")
                     break
-                else:
-                    for m in self.streamchain.stream(input_query):
-                        print(m, end="", flush=True)
-        else:
-            answer = self.streamchain.stream(input_query)
+                for m in self.streamchain.stream(input_query):
+                    print(m, end="", flush=True)
             return answer
+
+        answer = self.streamchain.stream(input_query)
+        return answer
 
 
 # https://api.python.langchain.com/en/latest/together/chat_models/langchain_together.chat_models.ChatTogether.html
