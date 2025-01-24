@@ -222,16 +222,16 @@ class DashboardEng:
         model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
         max_token=750,
     ):
-        Dtem = """Given the sample of a table: {table},
+        dtem = """Given the sample of a table: {table},
             Please suggest a dashboard layout that have a goal: {context}. The basic layout only has 2 layer, Top Layer and Bottom Layer.
             List down what plots should be on the top and the bottom, it is allowed to have zero plot in the layer. 
             There are only 6 types of plots for now: 'bar', 'line', 'numberOnly', 'textOnly', 'table', 'maps'. Also, following this rules: {rules}, then {additional_rules}.
             If possible, suggest at least 4 plots or More."""
 
-        self.DashSuggestprompt = ChatPromptTemplate.from_messages(
+        self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", "You are a data visualization expert."),
-                ("human", Dtem),
+                ("human", dtem),
             ]
         )
 
@@ -242,9 +242,9 @@ class DashboardEng:
             top_p=0.7,  # Nucleus sampling for diverse responses
         )
 
-        self.DashSuggestChain = (
+        self.dash_suggest_chain = (
             RunnablePassthrough()
-            | self.DashSuggestprompt
+            | self.dash_suggest_prompt
             | self.llm.with_structured_output(schema=DashboardSuggestOutput)
         )
 
@@ -259,6 +259,9 @@ class DashboardEng:
                 Use Clear and Consistent Visualizations: Choose the right chart type for each data point (e.g., bar charts for comparisons, line graphs for trends).
             """,
         }
-        output = self.DashSuggestChain.invoke(input_query)
+        output = self.dash_suggest_chain.invoke(input_query)
         output_json = json.loads(output.json())
         return output_json
+
+    def generate(self):
+        return {}
