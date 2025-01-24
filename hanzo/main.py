@@ -16,9 +16,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # from langchain.prompts import PromptTemplate
 from langchain_together import ChatTogether, TogetherEmbeddings
-from pydantic import BaseModel, Field
 
-from .src.common import init_logger
+from .utils.common import init_logger
+from .utils.jsonoutput import DashboardSuggestOutput, Ragoutput
 
 init_logger("hanzo")
 logger = logging.getLogger("hanzo")
@@ -74,19 +74,6 @@ class Vectordb:
         )
         logger.info("Done loading")
         # results = db.similarity_search_with_relevance_scores(query_text, k=3)
-
-
-class Ragoutput(BaseModel):
-    """RAG Styles
-
-    Args:
-        BaseModel (_type_): _description_
-    """
-
-    context: list = Field(description="list of the context")
-    answer: str = Field(
-        description="summary of the answer whioch not more than 10 sentences maximum"
-    )
 
 
 class Talk:
@@ -225,3 +212,53 @@ class Talk:
 
         answer = self.streamchain.stream(input_query)
         return answer
+
+
+class DashboardEng:
+    """Auto Dashboard"""
+
+    def __init__(
+        self,
+        model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        max_token=750,
+    ):
+        Dtem = """Given the sample of a table: {table},
+            Please suggest a dashboard layout that have a goal: {context}. The basic layout only has 2 layer, Top Layer and Bottom Layer.
+            List down what plots should be on the top and the bottom, it is allowed to have zero plot in the layer. 
+            There are only 6 types of plots for now: 'bar', 'line', 'numberOnly', 'textOnly', 'table', 'maps'. Also, following this rules: {rules}, then {additional_rules}.
+            If possible, suggest at least 4 plots or More."""
+
+        self.DashSuggestprompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You are a data visualization expert."),
+                ("human", Dtem),
+            ]
+        )
+
+        self.llm = ChatTogether(
+            model=model,
+            max_tokens=max_token,
+            temperature=0.8,  # Adds randomness to outputs
+            top_p=0.7,  # Nucleus sampling for diverse responses
+        )
+
+        self.DashSuggestChain = (
+            RunnablePassthrough()
+            | self.DashSuggestprompt
+            | self.llm.with_structured_output(schema=DashboardSuggestOutput)
+        )
+
+    def suggest(self, csv_input: str = None, context: str = None, rules: str = None):
+        input_query = {
+            "table": csv_input,
+            "context": context,
+            "additional_rules": rules,
+            "rules": """
+                Layer: First Layer only contains numberOnly / textOnly
+                Keep It Simple: Focus on the most important data. Avoid clutter by presenting only the essential metrics and visualizations that align with the dashboard's goal.
+                Use Clear and Consistent Visualizations: Choose the right chart type for each data point (e.g., bar charts for comparisons, line graphs for trends).
+            """,
+        }
+        output = self.DashSuggestChain.invoke(input_query)
+        output_json = json.loads(output.json())
+        return output_json

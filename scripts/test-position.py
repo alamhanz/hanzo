@@ -67,10 +67,20 @@ Dtem = """Given the sample of a table: {table},
         List down what plots should be on the top and the bottom, it is allowed to have zero plot in the layer. 
         There are only 6 types of plots for now: 'bar', 'line', 'numberOnly', 'textOnly', 'table', 'maps'. Also, following this rules: {rules}, then {additional_rules}.
         If possible, suggest at least 4 plots or More."""
-DashSuggestprompt = PromptTemplate(
-    template=Dtem,
-    input_variables=["context"],
-    # partial_variables={"format_instructions": format_output},
+
+# DashSuggestprompt = PromptTemplate(
+#     template=Dtem,
+#     input_variables=["context", "table", "rules", "additional_rules"],
+# )
+
+DashSuggestprompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are a data visualization expert."),
+        (
+            "human",
+            Dtem,
+        ),
+    ]
 )
 
 
