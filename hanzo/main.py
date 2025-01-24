@@ -248,7 +248,18 @@ class DashboardEng:
             | self.llm.with_structured_output(schema=DashboardSuggestOutput)
         )
 
-    def suggest(self, csv_input: str = None, context: str = None, rules: str = None):
+    def suggest_layout(self, csv_input: str, context: str = None, rules: str = None):
+        """_summary_
+
+        Args:
+            csv_input (str): _description_
+            context (str, optional): _description_. Defaults to None.
+            rules (str, optional): _description_. Defaults to None.
+
+        Returns:
+            _type_: _description_
+        """
+
         input_query = {
             "table": csv_input,
             "context": context,
@@ -259,9 +270,15 @@ class DashboardEng:
                 Use Clear and Consistent Visualizations: Choose the right chart type for each data point (e.g., bar charts for comparisons, line graphs for trends).
             """,
         }
+
         output = self.dash_suggest_chain.invoke(input_query)
         output_json = json.loads(output.json())
         return output_json
 
     def generate(self):
-        return {}
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
+        return {"status": "placeholder"}
