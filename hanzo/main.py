@@ -159,7 +159,7 @@ class Talk:
                     logger.info(e)
                     return {
                         "context": [],
-                        "answer": "I can't answer that for now. Try rephrase it.",
+                        "answer": "I can't answer that for now. Try rephrase or rerun it in the next 20 seconds.",
                     }
             else:
                 asking_hanzo = True
