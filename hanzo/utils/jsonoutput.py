@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from pydantic import BaseModel, Field
 
@@ -10,9 +10,14 @@ class Ragoutput(BaseModel):
         BaseModel (_type_): _description_
     """
 
-    context: list = Field(description="list of the context")
+    context: Union[List[str], str] = Field(
+        description=(
+            "Make the string context as list of the context. "
+            "Let it be an empty list if there is no context"
+        )
+    )
     answer: str = Field(
-        description="summary of the answer whioch not more than 10 sentences maximum"
+        description="summary of the answer which is not more than 10 sentences maximum"
     )
 
 

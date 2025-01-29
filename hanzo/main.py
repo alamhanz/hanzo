@@ -96,7 +96,7 @@ class Talk:
             self.retriever = None
 
         ## single shot instead of conversation
-        ragtemplate = """Given the context: {context},
+        ragtemplate = """Given the list of context: {context},
             Based on the context only, answer the following question with string one paragraph only: {question}. 
             Let me know if you can't answer it because lack of context"""
         self.ragprompt = PromptTemplate(
