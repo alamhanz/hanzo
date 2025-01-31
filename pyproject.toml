@@ -19,6 +19,8 @@ dependencies = [
     "langchain-community>=0.3.7",
     "langchain-together>=0.3.0",
     "color-log>=1.0.9",
+    "python-dotenv==1.0.1",
+    "langchain-chroma>=0.2.1"
 ]
 license = {text = "MIT"}
 classifiers = [
@@ -42,7 +44,6 @@ distribution = true
 [tool.pdm.dev-dependencies]
 test = [
     "pytest>=6.0",
-    "python-dotenv==1.0.1",
     "google-cloud-storage==2.18.2"
 ]
 
