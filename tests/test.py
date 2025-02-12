@@ -56,7 +56,20 @@ load_dotenv()
 city_expert = IndoCityExpert()
 
 input_query = {
-    "cities_list": ["Jakrta", "sulawei selatan", "kaltim"],
+    "cities_list": ",".join(
+        [
+            "Jakrta",
+            "Sulawesi Utra",
+            "kaltim",
+            "sumut",
+            "kalteng",
+            "D.I Yogyakarta",
+            "Purwakart",
+            "Subng",
+            "sukabuma",
+            "taskmalaya",
+        ]
+    ),
 }
-output = city_expert.suggest_cities(**input_query)
+output = city_expert.normalized_cities(**input_query)
 print(output)
