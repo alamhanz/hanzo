@@ -293,8 +293,10 @@ class IndoCityExpert:
         model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
         max_token=750,
     ):
-        dtem = """Given the list of strings seperated by comma: {cities},
-            Please normalized those strings with the closest real cities name in Indonesia, top 3."""
+        dtem = (
+            "Given the list of strings seperated by comma: {cities},"
+            " Please normalized those strings with the closest real cities name in Indonesia, top 3"
+        )
 
         self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
             [
@@ -325,7 +327,7 @@ class IndoCityExpert:
             cities_list (json): A string of cities name separated by comma.
 
         Returns:
-            _type_: A dictionary with a key of 'cities' and a value of list of strings of cities name.
+            _type_: A dictionary with a key of cities and a value of list of strings of cities name.
             The list of cities name will be sorted by the closest first.
         """
         input_query = {
@@ -337,3 +339,11 @@ class IndoCityExpert:
             return {"cities": []}
         output_json = json.loads(output.json())
         return output_json
+
+    def generate(self):
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
+        return {"status": "placeholder"}
