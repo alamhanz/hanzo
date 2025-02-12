@@ -16,7 +16,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_together import ChatTogether, TogetherEmbeddings
 
 from .utils.common import init_logger
-from .utils.jsonoutput import DashboardSuggestOutput, Ragoutput
+from .utils.jsonoutput import DashboardSuggestOutput, IndoCityOutput, Ragoutput
 
 init_logger("hanzo")
 logger = logging.getLogger("hanzo")
@@ -283,3 +283,55 @@ class DashboardEng:
             _type_: _description_
         """
         return {"status": "placeholder"}
+
+
+class IndoCityExpert:
+    """City Expert"""
+
+    def __init__(
+        self,
+        model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        max_token=750,
+    ):
+        dtem = """Given the list of strings: {cities},
+            Please suggest 3 closest real cities name in Indonesia."""
+
+        self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You are a Indonesia Geography expert."),
+                ("human", dtem),
+            ]
+        )
+
+        self.llm = ChatTogether(
+            model=model,
+            max_tokens=max_token,
+            temperature=0.8,  # Adds randomness to outputs
+            top_p=0.7,  # Nucleus sampling for diverse responses
+        )
+
+        self.dash_suggest_chain = (
+            RunnablePassthrough()
+            | self.dash_suggest_prompt
+            | self.llm.with_structured_output(schema=IndoCityOutput)
+        )
+
+    def suggest_cities(self, cities_list):
+        """
+        Given the list of strings of cities name,
+        This function will suggest 3 closest real cities name in Indonesia.
+
+        Args:
+            cities_list (json): A string of cities name separated by comma.
+
+        Returns:
+            _type_: A dictionary with a key of 'cities' and a value of list of strings of cities name.
+            The list of cities name will be sorted by the closest first.
+        """
+        input_query = {
+            "cities": cities_list,
+        }
+
+        output = self.dash_suggest_chain.invoke(input_query)
+        output_json = json.loads(output.json())
+        return output_json
