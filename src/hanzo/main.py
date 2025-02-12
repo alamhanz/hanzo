@@ -224,10 +224,13 @@ class DashboardEng:
         max_token=750,
     ):
         dtem = """Given the sample of a table: {table},
-            Please suggest a dashboard layout that have a goal: {context}. The basic layout only has 2 layer, Top Layer and Bottom Layer.
-            List down what plots should be on the top and the bottom, it is allowed to have zero plot in the layer. 
-            There are only 6 types of plots for now: 'bar', 'line', 'numberOnly', 'textOnly', 'table', 'maps'. Also, following this rules: {rules}, then {additional_rules}.
-            If possible, suggest at least 4 plots or More."""
+            Please suggest a dashboard layout that have a goal: {context}. The basic layout is a grid with 30 columns and 30 rows.
+            There are only 6 types of charts for now: 'bar', 'line', 'numberOnly', 'textOnly', 'table', 'maps'. 
+            Also, following this rules: {rules}, then {additional_rules}.
+            If possible, suggest at least 5 charts or More."""
+
+        dtem2 = """Given a dashboard layout: {current_layout},
+            Please adjust the size and location to not overlapping and following this rules: {rules}"""
 
         self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
             [
@@ -236,16 +239,29 @@ class DashboardEng:
             ]
         )
 
+        self.dash_adjustment_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You are a data visualization expert."),
+                ("human", dtem2),
+            ]
+        )
+
         self.llm = ChatTogether(
             model=model,
             max_tokens=max_token,
-            temperature=0.95,  # Adds randomness to outputs
-            top_p=0.65,  # Nucleus sampling for diverse responses
+            temperature=0.75,  # Adds randomness to outputs
+            top_p=0.85,  # Nucleus sampling for diverse responses
         )
 
         self.dash_suggest_chain = (
             RunnablePassthrough()
             | self.dash_suggest_prompt
+            | self.llm.with_structured_output(schema=DashboardSuggestOutput)
+        )
+
+        self.dash_adjustment_chain = (
+            RunnablePassthrough()
+            | self.dash_adjustment_prompt
             | self.llm.with_structured_output(schema=DashboardSuggestOutput)
         )
 
@@ -266,13 +282,24 @@ class DashboardEng:
             "context": context,
             "additional_rules": rules,
             "rules": """
-                Layer: First Layer only contains numberOnly / textOnly
                 Keep It Simple: Focus on the most important data. Avoid clutter by presenting only the essential metrics and visualizations that align with the dashboard's goal.
                 Use Clear and Consistent Visualizations: Choose the right chart type for each data point (e.g., bar charts for comparisons, line graphs for trends).
             """,
         }
 
         output = self.dash_suggest_chain.invoke(input_query)
+        output_json = json.loads(output.json())
+
+        input_json = {
+            "current_layout": output_json,
+            "rules": """
+                Dense Chart: use exactly 1 grid as space between charts. No empty space between charts.
+                use variance width: as a note, it doesn't make sense to use too wide width for "numberOnly".
+                big proportion: Make sure that Bar, Line, table, or maps have a proportion 1:2 or 2:3 for its width:height.
+            """,
+        }
+
+        output_json = self.dash_adjustment_chain.invoke(input_json)
         output_json = json.loads(output.json())
         return output_json
 

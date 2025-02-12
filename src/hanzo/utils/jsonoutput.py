@@ -21,26 +21,31 @@ class Ragoutput(BaseModel):
     )
 
 
+class Position(BaseModel):
+    """position of the chart"""
+
+    x: int = Field(description="Starting column (0-based index)")
+    y: int = Field(description="Starting row (0-based index)")
+    width: int = Field(description="Number of columns the chart spans")
+    height: int = Field(description="Number of rows the chart spans")
+
+
 class DashboardDetail(BaseModel):
     """Details of each dashboard context"""
 
-    name: str = Field(
-        description="The suggested name of the plot. make the name easy to understand."
+    chart_id: str = Field(description="unique id of the chart")
+    title: str = Field(description="title of the chart")
+    chart_type: str = Field(
+        description="type of the chart. The types is either 'bar', 'line', 'numberOnly', 'textOnly', 'table', or 'maps'"
     )
-    plot_type: str = Field(description="The plot suggestion type")
-    plot_explaination: str = Field(
-        description="The plot description in 3 sentences max which explain what should be put in each axis."
-    )
+    position: Position = Field(description="position of the chart")
 
 
 class DashboardSuggestOutput(BaseModel):
     """RAG Styles"""
 
-    top_layer: List[DashboardDetail] = Field(
-        description="List of plots contexts with detailed information that located on the top"
-    )
-    bottom_layer: List[DashboardDetail] = Field(
-        description="List of plots contexts with detailed information that located on the bottom"
+    chart_position: List[DashboardDetail] = Field(
+        description="List of charts contexts with detailed information that located on the grid"
     )
 
 
