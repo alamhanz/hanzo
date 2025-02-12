@@ -42,3 +42,18 @@ class DashboardSuggestOutput(BaseModel):
     bottom_layer: List[DashboardDetail] = Field(
         description="List of plots contexts with detailed information that located on the bottom"
     )
+
+
+class CityList(BaseModel):
+    """List of cities"""
+
+    city: str = Field(description="Original city name.")
+    suggestions: List[str] = Field(description="List of suggested real cities name.")
+
+
+class IndoCityOutput(BaseModel):
+    """RAG Styles"""
+
+    cities: List[CityList] = Field(
+        description="List of closest real cities name in Indonesia"
+    )
