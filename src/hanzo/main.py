@@ -239,8 +239,8 @@ class DashboardEng:
         self.llm = ChatTogether(
             model=model,
             max_tokens=max_token,
-            temperature=0.8,  # Adds randomness to outputs
-            top_p=0.7,  # Nucleus sampling for diverse responses
+            temperature=0.95,  # Adds randomness to outputs
+            top_p=0.65,  # Nucleus sampling for diverse responses
         )
 
         self.dash_suggest_chain = (
@@ -293,12 +293,12 @@ class IndoCityExpert:
         model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
         max_token=750,
     ):
-        dtem = """Given the list of strings: {cities},
-            Please suggest 3 closest real cities name in Indonesia."""
+        dtem = """Given the list of strings seperated by comma: {cities},
+            Please normalized those strings with the closest real cities name in Indonesia, top 3."""
 
         self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "You are a Indonesia Geography expert."),
+                ("system", "You are a Indonesia Geography expert"),
                 ("human", dtem),
             ]
         )
@@ -307,7 +307,7 @@ class IndoCityExpert:
             model=model,
             max_tokens=max_token,
             temperature=0.8,  # Adds randomness to outputs
-            top_p=0.7,  # Nucleus sampling for diverse responses
+            top_p=0.95,  # Nucleus sampling for diverse responses (highly probable words are chosen)
         )
 
         self.dash_suggest_chain = (
@@ -316,7 +316,7 @@ class IndoCityExpert:
             | self.llm.with_structured_output(schema=IndoCityOutput)
         )
 
-    def suggest_cities(self, cities_list):
+    def normalized_cities(self, cities_list):
         """
         Given the list of strings of cities name,
         This function will suggest 3 closest real cities name in Indonesia.
@@ -333,5 +333,7 @@ class IndoCityExpert:
         }
 
         output = self.dash_suggest_chain.invoke(input_query)
+        if output is None:
+            return {"cities": []}
         output_json = json.loads(output.json())
         return output_json

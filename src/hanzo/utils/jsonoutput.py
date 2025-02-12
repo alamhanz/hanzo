@@ -47,8 +47,8 @@ class DashboardSuggestOutput(BaseModel):
 class CityList(BaseModel):
     """List of cities"""
 
-    city: str = Field(description="Original city name")
-    suggestions: List[str] = Field(description="List of suggested cities name")
+    city: str = Field(description="Original city name.")
+    suggestions: List[str] = Field(description="List of suggested real cities name.")
 
 
 class IndoCityOutput(BaseModel):
