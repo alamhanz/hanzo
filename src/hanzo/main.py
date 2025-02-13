@@ -16,7 +16,12 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_together import ChatTogether, TogetherEmbeddings
 
 from .utils.common import init_logger
-from .utils.jsonoutput import DashboardSuggestOutput, IndoCityOutput, Ragoutput
+from .utils.jsonoutput import (
+    ChartOptionsOutput,
+    DashboardLayoutOutput,
+    IndoCityOutput,
+    Ragoutput,
+)
 
 init_logger("hanzo")
 logger = logging.getLogger("hanzo")
@@ -224,10 +229,14 @@ class DashboardEng:
         max_token=750,
     ):
         dtem = """Given the sample of a table: {table},
-            Please suggest a dashboard layout that have a goal: {context}. The basic layout only has 2 layer, Top Layer and Bottom Layer.
-            List down what plots should be on the top and the bottom, it is allowed to have zero plot in the layer. 
-            There are only 6 types of plots for now: 'bar', 'line', 'numberOnly', 'textOnly', 'table', 'maps'. Also, following this rules: {rules}, then {additional_rules}.
-            If possible, suggest at least 4 plots or More."""
+            Suggest charts in the dashboard with this goal: {context}.
+            Also, following this rules: {rules}, then {additional_rules}.
+            If possible, suggest at least 10 charts or More. With 2 or 3 or 4 numberOnly charts."""
+
+        dtem2 = """Given the chart options and its suggestion: {current_layout}, suggest a real dashboard layout. 
+            The basic layout is a grid with 29 columns and 18 rows.
+            Not necessary to use all charts, prioritize the most important charts.
+            Please adjust the size and location following this rules: {rules}"""
 
         self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
             [
@@ -236,17 +245,30 @@ class DashboardEng:
             ]
         )
 
+        self.dash_adjustment_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You are a data visualization expert."),
+                ("human", dtem2),
+            ]
+        )
+
         self.llm = ChatTogether(
             model=model,
             max_tokens=max_token,
             temperature=0.95,  # Adds randomness to outputs
-            top_p=0.65,  # Nucleus sampling for diverse responses
+            top_p=0.8,  # Nucleus sampling for diverse responses
         )
 
-        self.dash_suggest_chain = (
+        self.chart_suggest_chain = (
             RunnablePassthrough()
             | self.dash_suggest_prompt
-            | self.llm.with_structured_output(schema=DashboardSuggestOutput)
+            | self.llm.with_structured_output(schema=ChartOptionsOutput)
+        )
+
+        self.dash_layout_chain = (
+            RunnablePassthrough()
+            | self.dash_adjustment_prompt
+            | self.llm.with_structured_output(schema=DashboardLayoutOutput)
         )
 
     def suggest_layout(self, csv_input: str, context: str = None, rules: str = None):
@@ -266,15 +288,38 @@ class DashboardEng:
             "context": context,
             "additional_rules": rules,
             "rules": """
-                Layer: First Layer only contains numberOnly / textOnly
-                Keep It Simple: Focus on the most important data. Avoid clutter by presenting only the essential metrics and visualizations that align with the dashboard's goal.
-                Use Clear and Consistent Visualizations: Choose the right chart type for each data point (e.g., bar charts for comparisons, line graphs for trends).
+                Keep It Simple: Presenting only the essential metrics and visualizations that align with the dashboard's goal.
+                Use Clear and Consistent Visualizations: Choose the right chart type (e.g., bar charts for comparisons, line graphs for trends).
             """,
         }
 
-        output = self.dash_suggest_chain.invoke(input_query)
-        output_json = json.loads(output.json())
-        return output_json
+        output = self.chart_suggest_chain.invoke(input_query)
+        chart_options = json.loads(output.json())
+
+        input_json = {
+            "current_layout": chart_options,
+            "rules": """
+                Cover the whole grid, no overside, No empty space.
+                Utilize Masonry-style layout, placed next to each other without intersecting or overlap.
+                The width > height for all charts except table chart.
+                numberOnly charts always together. lining horizontally on the top or lining vertically on the left or right side.
+                numberOnly charts size ratio is 2:3 or 1:2 or 2:5 for width : height, with minimum height of 4.
+                For all charts, Width and height are always larger than 3.
+                Table chart is the only type that allow to have height > width.
+                numberOnly charts always have the smallest size than the other charts.
+            """,
+        }
+
+        output_json = self.dash_layout_chain.invoke(input_json)
+        real_position = json.loads(output_json.json())
+
+        for chart_option in chart_options["chart_options"]:
+            for chart_position in real_position["chart_position"]:
+                if chart_option["chart_id"] == chart_position["chart_id"]:
+                    chart_option["position"] = chart_position["position"]
+                    break
+
+        return chart_options
 
     def generate(self):
         """_summary_
