@@ -231,10 +231,10 @@ class DashboardEng:
         dtem = """Given the sample of a table: {table},
             Suggest charts in the dashboard with this goal: {context}.
             Also, following this rules: {rules}, then {additional_rules}.
-            If possible, suggest at least 8 charts or More. With 2 or more numberOnly charts."""
+            If possible, suggest at least 10 charts or More. With 2 or 3 or 4 numberOnly charts."""
 
         dtem2 = """Given the chart options and its suggestion: {current_layout}, suggest a real dashboard layout. 
-            The basic layout is a grid with 27 columns and 21 rows.
+            The basic layout is a grid with 29 columns and 18 rows.
             Not necessary to use all charts, prioritize the most important charts.
             Please adjust the size and location following this rules: {rules}"""
 
@@ -299,12 +299,11 @@ class DashboardEng:
         input_json = {
             "current_layout": chart_options,
             "rules": """
-                Utilize Masonry-style layout, where charts are placed next to each other without intersecting another with exactly a one grid gap.
-                Cover the whole grid, prevent over the grid, use large or wider size to cover the whole grid, but maintain the one grid gap.
-                The width > height for all charts except table chart. Especially Line and bar, width >= 1.5*height.
+                Cover the whole grid, no overside, No empty space.
+                Utilize Masonry-style layout, placed next to each other without intersecting or overlap.
+                The width > height for all charts except table chart.
                 numberOnly charts always together. lining horizontally on the top or lining vertically on the left or right side.
-                numberOnly charts size ratio is 2 : 3 for width : height, with minimum height of 4.
-                It is okay to have wide bar or line charts. 
+                numberOnly charts size ratio is 2:3 or 1:2 or 2:5 for width : height, with minimum height of 4.
                 For all charts, Width and height are always larger than 3.
                 Table chart is the only type that allow to have height > width.
                 numberOnly charts always have the smallest size than the other charts.
