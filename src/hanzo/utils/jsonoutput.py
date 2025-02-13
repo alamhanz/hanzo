@@ -21,7 +21,7 @@ class Ragoutput(BaseModel):
     )
 
 
-class Position(BaseModel):
+class ChartPosition(BaseModel):
     """position of the chart"""
 
     x: int = Field(description="Starting column (0-based index)")
@@ -34,17 +34,37 @@ class DashboardDetail(BaseModel):
     """Details of each dashboard context"""
 
     chart_id: str = Field(description="unique id of the chart")
-    title: str = Field(description="title of the chart")
-    chart_type: str = Field(
-        description="type of the chart. The types is either 'bar', 'line', 'numberOnly', 'textOnly', 'table', or 'maps'"
+    position: ChartPosition = Field(
+        description="position of the chart. It could be None if the chart is not choosen to be shown"
     )
-    position: Position = Field(description="position of the chart")
 
 
-class DashboardSuggestOutput(BaseModel):
+class DashboardLayoutOutput(BaseModel):
     """RAG Styles"""
 
     chart_position: List[DashboardDetail] = Field(
+        description="List of charts contexts with detailed information that located on the grid"
+    )
+
+
+class ChartDetail(BaseModel):
+    """Details of each dashboard context"""
+
+    chart_id: str = Field(description="unique id of the chart")
+    title: str = Field(description="title of the chart")
+    description: str = Field(description="chart description")
+    chart_type: str = Field(
+        description="type of the chart. The types is either 'bar', 'line', 'numberOnly', 'textOnly', 'table', or 'maps'"
+    )
+    priority: str = Field(
+        description="priority of the chart. The priority is either 'primary', 'secondary', or 'tertiary'"
+    )
+
+
+class ChartOptionsOutput(BaseModel):
+    """RAG Styles"""
+
+    chart_options: List[ChartDetail] = Field(
         description="List of charts contexts with detailed information that located on the grid"
     )
 

@@ -13,8 +13,8 @@
     }
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(30, 40px);
-      grid-template-rows: repeat(30, 40px);
+      grid-template-columns: repeat(30, 30px);
+      grid-template-rows: repeat(30, 30px);
       gap: 10px;
       width: auto;
       position: relative;
@@ -28,10 +28,11 @@
       font-weight: bold;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       position: absolute;
+      box-sizing: border-box;
     }
     .bar { background-color: #3498db; }
     .line { background-color: #e74c3c; }
-    .numberOnly { background-color: #2ecc71; }
+    .numberOnly { background-color: #2e975a; }
     .textOnly { background-color: #9b59b6; }
     .table { background-color: #f1c40f; color: black; }
     .maps { background-color: #e67e22; }
@@ -43,7 +44,7 @@
       height: 100%;
       pointer-events: none;
       display: none;
-      background-size: 40px 40px;
+      background-size: 30px 30px;
       background-image: linear-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px),
                         linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
     }
@@ -57,7 +58,7 @@
 
   <script>
     const enableGridLines = true; // Set to false to hide grid lines
-    const gridSize = 40; // Grid cell size in pixels
+    const gridSize = 30; // Grid cell size in pixels
 
     async function generateDashboard() {
       try {
@@ -70,18 +71,18 @@
           gridLines.style.display = 'block';
         }
 
-        const chartPositions = data.chart_position;
+        const chartPositions = data.chart_options;
 
         chartPositions.forEach(chart => {
           const chartElement = document.createElement('div');
           chartElement.classList.add('chart', chart.chart_type);
           chartElement.textContent = `${chart.title} (${chart.chart_type})`;
           
-          // Set exact position and size based on 40px grid
-          chartElement.style.width = `${(chart.position.width-1) * gridSize}px`;
-          chartElement.style.height = `${(chart.position.height-1) * gridSize}px`;
-          chartElement.style.left = `${(chart.position.x+3) * gridSize}px`;
-          chartElement.style.top = `${chart.position.y * gridSize}px`;
+          // Ensure the exact coverage of grid units
+          chartElement.style.width = `${(chart.position.width) * gridSize}px`;
+          chartElement.style.height = `${(chart.position.height) * gridSize}px`;
+          chartElement.style.left = `${(chart.position.x+6) * gridSize}px`;
+          chartElement.style.top = `${(chart.position.y+2) * gridSize}px`;
           
           dashboard.appendChild(chartElement);
         });

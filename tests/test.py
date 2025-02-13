@@ -39,12 +39,6 @@ Transaction_ID,Product_Name,Quantity_Sold,Unit_Price,Transaction_Date,Sales_Area
 2,Banana,3,0.8,2025-01-02,South,M002,Cash,C002,$1 discount
 3,Orange,7,1.5,2025-01-03,East,M003,Mobile Payment,C001,5% off
 4,Grapes,2,2.5,2025-01-04,West,M004,Credit Card,C003,No discount
-5,Pineapple,4,3.0,2025-01-05,North,M001,Cash,C004,10% off
-6,Mango,6,1.8,2025-01-06,South,M005,Mobile Payment,C005,$2 discount
-7,Strawberry,8,2.0,2025-01-07,East,M003,Credit Card,C002,No discount
-8,Peach,3,1.7,2025-01-08,West,M006,Cash,C003,10% off
-9,Watermelon,10,0.5,2025-01-09,North,M007,Mobile Payment,C004,$3 discount
-10,Blueberry,5,2.2,2025-01-10,South,M008,Credit Card,C001,No discount
 """,
     "context": """summary of the sales.""",
     "rules": """show total customer.""",

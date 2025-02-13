@@ -1,70 +1,103 @@
 {
-    "chart_position": [
+    "chart_options": [
         {
-            "chart_id": "1",
+            "chart_id": "total_sales",
             "title": "Total Sales",
+            "description": "Total sales amount",
             "chart_type": "numberOnly",
+            "priority": "primary",
             "position": {
                 "x": 0,
                 "y": 0,
-                "width": 5,
-                "height": 5
+                "width": 6,
+                "height": 4
             }
         },
         {
-            "chart_id": "2",
-            "title": "Top 5 Sales by Product",
+            "chart_id": "sales_by_area",
+            "title": "Sales by Area",
+            "description": "Sales amount by area",
             "chart_type": "bar",
+            "priority": "primary",
             "position": {
-                "x": 6,
-                "y": 0,
-                "width": 10,
-                "height": 10
+                "x": 0,
+                "y": 5,
+                "width": 12,
+                "height": 8
             }
         },
         {
-            "chart_id": "3",
-            "title": "Sales Trend by Month",
+            "chart_id": "top_selling_products",
+            "title": "Top Selling Products",
+            "description": "Top 5 selling products",
+            "chart_type": "bar",
+            "priority": "secondary",
+            "position": {
+                "x": 13,
+                "y": 5,
+                "width": 12,
+                "height": 8
+            }
+        },
+        {
+            "chart_id": "sales_trend",
+            "title": "Sales Trend",
+            "description": "Monthly sales trend",
             "chart_type": "line",
-            "position": {
-                "x": 17,
-                "y": 0,
-                "width": 13,
-                "height": 10
-            }
-        },
-        {
-            "chart_id": "4",
-            "title": "Total Customer",
-            "chart_type": "numberOnly",
+            "priority": "secondary",
             "position": {
                 "x": 0,
-                "y": 6,
-                "width": 5,
-                "height": 5
+                "y": 14,
+                "width": 18,
+                "height": 7
             }
         },
         {
-            "chart_id": "5",
-            "title": "Sales by Region",
-            "chart_type": "bar",
+            "chart_id": "total_customers",
+            "title": "Total Customers",
+            "description": "Total number of customers",
+            "chart_type": "numberOnly",
+            "priority": "primary",
             "position": {
-                "x": 6,
-                "y": 11,
-                "width": 10,
-                "height": 10
+                "x": 7,
+                "y": 0,
+                "width": 6,
+                "height": 4
             }
         },
         {
-            "chart_id": "6",
+            "chart_id": "customer_distribution",
+            "title": "Customer Distribution",
+            "description": "Distribution of customers by area",
+            "chart_type": "pie",
+            "priority": "tertiary"
+        },
+        {
+            "chart_id": "sales_by_merchant",
+            "title": "Sales by Merchant",
+            "description": "Sales amount by merchant",
+            "chart_type": "bar",
+            "priority": "secondary",
+            "position": {
+                "x": 19,
+                "y": 5,
+                "width": 8,
+                "height": 8
+            }
+        },
+        {
+            "chart_id": "average_transaction_value",
+            "title": "Average Transaction Value",
+            "description": "Average transaction value by area",
+            "chart_type": "bar",
+            "priority": "tertiary"
+        },
+        {
+            "chart_id": "sales_by_payment_method",
             "title": "Sales by Payment Method",
+            "description": "Sales amount by payment method",
             "chart_type": "bar",
-            "position": {
-                "x": 17,
-                "y": 11,
-                "width": 13,
-                "height": 10
-            }
+            "priority": "tertiary"
         }
     ]
 }
