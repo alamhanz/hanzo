@@ -24,10 +24,10 @@ class Ragoutput(BaseModel):
 class ChartPosition(BaseModel):
     """position of the chart"""
 
-    x: int = Field(description="Starting column (0-based index)")
-    y: int = Field(description="Starting row (0-based index)")
-    width: int = Field(description="Number of columns the chart spans")
-    height: int = Field(description="Number of rows the chart spans")
+    x: float = Field(description="Starting column (0-based index)")
+    y: float = Field(description="Starting row (0-based index)")
+    width: float = Field(description="x-axis size of the chart spans")
+    height: float = Field(description="y-axis size of the chart spans")
 
 
 class DashboardDetail(BaseModel):
@@ -35,7 +35,7 @@ class DashboardDetail(BaseModel):
 
     chart_id: str = Field(description="unique id of the chart")
     position: ChartPosition = Field(
-        description="position of the chart. It could be None if the chart is not choosen to be shown"
+        description="position of the chart. It could be None if the chart is not choosen to be shown. Make position None if the chart is not shown"
     )
 
 
@@ -43,7 +43,7 @@ class DashboardLayoutOutput(BaseModel):
     """RAG Styles"""
 
     chart_position: List[DashboardDetail] = Field(
-        description="List of charts contexts with detailed information that located on the grid"
+        description="List of charts positions in grid."
     )
 
 
@@ -54,10 +54,10 @@ class ChartDetail(BaseModel):
     title: str = Field(description="title of the chart")
     description: str = Field(description="chart description")
     chart_type: str = Field(
-        description="type of the chart. The types is either 'bar', 'line', 'numberOnly', 'textOnly', 'table', or 'maps'"
+        description="type of the chart. The types is either 'bar', 'line', 'numberOnly', 'textOnly', 'table', or 'maps'. No other types are allowed. Dont use maps if no longitude and latitude provided"
     )
-    priority: str = Field(
-        description="priority of the chart. The priority is either 'primary', 'secondary', or 'tertiary'"
+    priority_level: int = Field(
+        description="priority of the chart. The priority is between 1 to 10. The lower the number, the higher the priority. It is allowed to have same priority level"
     )
 
 

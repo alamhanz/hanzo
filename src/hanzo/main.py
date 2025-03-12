@@ -231,11 +231,9 @@ class DashboardEng:
         dtem = """Given the sample of a table: {table},
             Suggest charts in the dashboard with this goal: {context}.
             Also, following this rules: {rules}, then {additional_rules}.
-            If possible, suggest at least 10 charts or More. With 2 or 3 or 4 numberOnly charts."""
+            If possible, suggest at least 7 charts or More."""
 
-        dtem2 = """Given the chart options and its suggestion: {current_layout}, suggest a real dashboard layout. 
-            The basic layout is a grid with 29 columns and 18 rows.
-            Not necessary to use all charts, prioritize the most important charts.
+        dtem2 = """Given the chart options and its suggestion: {current_layout}, suggest a real dashboard layout.
             Please adjust the size and location following this rules: {rules}"""
 
         self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
@@ -289,24 +287,37 @@ class DashboardEng:
             "additional_rules": rules,
             "rules": """
                 Keep It Simple: Presenting only the essential metrics and visualizations that align with the dashboard's goal.
-                Use Clear and Consistent Visualizations: Choose the right chart type (e.g., bar charts for comparisons, line graphs for trends).
+                Choose the right chart type (e.g., bar charts for comparisons, line graphs for trends).
+                prioritize the most relevant charts by the goal of the dashboard.
             """,
         }
 
         output = self.chart_suggest_chain.invoke(input_query)
         chart_options = json.loads(output.json())
 
+        # input_json = {
+        #     "current_layout": chart_options,
+        #     "rules": """
+        #         Utilize Masonry-style layout, placed next to each other without intersecting or overlap.
+        #         numberOnly charts always together. lining horizontally on the top or lining vertically on the left or right side.
+        #         Here the example size of the charts (it is allowed to adjust the size without violating the example ratio), it is allowed to use maximum 2 floating points size:
+        #         numberOnly/textOnly: 4x3.1, 5.21x3, 6.1x3.2, 7.1x3.3, 6.1x4.3, 7.1x4.2, 8.1x4.2, etc.
+        #         bar/line/maps: 11.1x6.2, 12.1x6.1, 13.2x6.1, 14x6.2, 15x6, 12x7, 13x7, 14x7, 15.1x7.1, 16x7, 13x8, 14x8, 15x8.3, 16x8.2, 17x8, etc.
+        #         table: 7.3x8, 7.03x9.1, 7x10, 8x9, 8x10, 8x11, 8x12, 9x10.1, 9x11, 9x12, etc.
+        #         The whole dashboard is a grid with 29 columns and 18 rows.
+        #         adjust, reduce or stretch the size of the charts to fit the whole dashboard without overlapping.
+        #         It is allowed to not show all charts. Minimum 2 numberOnly charts and minimum total charts is 6.
+        #     """,
+        # }
         input_json = {
             "current_layout": chart_options,
             "rules": """
-                Cover the whole grid, no overside, No empty space.
+                The whole dashboard is a grid with 29 columns and 18 rows, make sure all dashboard grids is covered.
+                Put all charts to the dashboard. Its okay to put wide charts.
+                Make sure use smaller size for less priority charts (1 means the highest priority).
                 Utilize Masonry-style layout, placed next to each other without intersecting or overlap.
-                The width > height for all charts except table chart.
                 numberOnly charts always together. lining horizontally on the top or lining vertically on the left or right side.
-                numberOnly charts size ratio is 2:3 or 1:2 or 2:5 for width : height, with minimum height of 4.
-                For all charts, Width and height are always larger than 3.
-                Table chart is the only type that allow to have height > width.
-                numberOnly charts always have the smallest size than the other charts.
+                Left no empty space.
             """,
         }
 

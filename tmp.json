@@ -1,146 +1,120 @@
 {
     "chart_options": [
         {
-            "chart_id": "1",
+            "chart_id": "chart1",
             "title": "Total Sales",
             "description": "Total sales amount",
             "chart_type": "numberOnly",
-            "priority": "primary",
+            "priority_level": 1,
             "position": {
-                "x": 0,
-                "y": 0,
-                "width": 4,
-                "height": 6
+                "x": 0.0,
+                "y": 0.0,
+                "width": 5.0,
+                "height": 2.0
             }
         },
         {
-            "chart_id": "2",
-            "title": "Total Quantity Sold",
-            "description": "Total quantity of products sold",
-            "chart_type": "numberOnly",
-            "priority": "primary",
-            "position": {
-                "x": 4,
-                "y": 0,
-                "width": 4,
-                "height": 6
-            }
-        },
-        {
-            "chart_id": "3",
-            "title": "Average Unit Price",
-            "description": "Average unit price of products sold",
-            "chart_type": "numberOnly",
-            "priority": "primary",
-            "position": {
-                "x": 8,
-                "y": 0,
-                "width": 4,
-                "height": 6
-            }
-        },
-        {
-            "chart_id": "4",
-            "title": "Top 5 Products by Sales",
-            "description": "Top 5 products with the highest sales amount",
+            "chart_id": "chart2",
+            "title": "Top Selling Products",
+            "description": "Top 5 products by total sales amount",
             "chart_type": "bar",
-            "priority": "secondary",
+            "priority_level": 2,
             "position": {
-                "x": 0,
-                "y": 6,
-                "width": 8,
-                "height": 8
+                "x": 0.0,
+                "y": 2.0,
+                "width": 10.0,
+                "height": 4.0
             }
         },
         {
-            "chart_id": "5",
+            "chart_id": "chart3",
             "title": "Sales by Region",
-            "description": "Sales amount by region",
+            "description": "Total sales amount by region",
             "chart_type": "bar",
-            "priority": "secondary",
+            "priority_level": 3,
             "position": {
-                "x": 8,
-                "y": 6,
-                "width": 8,
-                "height": 8
+                "x": 10.0,
+                "y": 2.0,
+                "width": 10.0,
+                "height": 4.0
             }
         },
         {
-            "chart_id": "6",
-            "title": "Sales by Merchant",
-            "description": "Sales amount by merchant",
-            "chart_type": "bar",
-            "priority": "secondary",
-            "position": {
-                "x": 16,
-                "y": 14,
-                "width": 8,
-                "height": 4
-            }
-        },
-        {
-            "chart_id": "7",
+            "chart_id": "chart4",
             "title": "Sales Trend",
-            "description": "Sales amount over time",
+            "description": "Total sales amount over time",
             "chart_type": "line",
-            "priority": "secondary",
+            "priority_level": 4,
             "position": {
-                "x": 0,
-                "y": 14,
-                "width": 16,
-                "height": 4
+                "x": 0.0,
+                "y": 6.0,
+                "width": 14.0,
+                "height": 4.0
             }
         },
         {
-            "chart_id": "8",
-            "title": "Top 5 Customers by Sales",
-            "description": "Top 5 customers with the highest sales amount",
-            "chart_type": "bar",
-            "priority": "secondary",
+            "chart_id": "chart5",
+            "title": "Average Order Value",
+            "description": "Average order value over time",
+            "chart_type": "line",
+            "priority_level": 5,
             "position": {
-                "x": 16,
-                "y": 6,
-                "width": 8,
-                "height": 8
+                "x": 14.0,
+                "y": 6.0,
+                "width": 10.0,
+                "height": 4.0
             }
         },
         {
-            "chart_id": "9",
-            "title": "Sales by Payment Method",
-            "description": "Sales amount by payment method",
-            "chart_type": "bar",
-            "priority": "tertiary",
-            "position": {
-                "x": 24,
-                "y": 6,
-                "width": 5,
-                "height": 12
-            }
-        },
-        {
-            "chart_id": "10",
-            "title": "Total Customer",
+            "chart_id": "chart6",
+            "title": "Total Customers",
             "description": "Total number of customers",
             "chart_type": "numberOnly",
-            "priority": "primary",
+            "priority_level": 6,
             "position": {
-                "x": 12,
-                "y": 0,
-                "width": 4,
-                "height": 6
+                "x": 6.0,
+                "y": 0.0,
+                "width": 5.0,
+                "height": 2.0
             }
         },
         {
-            "chart_id": "11",
+            "chart_id": "chart7",
             "title": "Customer Distribution by Region",
             "description": "Number of customers by region",
             "chart_type": "bar",
-            "priority": "tertiary",
+            "priority_level": 7,
             "position": {
-                "x": 24,
-                "y": 0,
-                "width": 5,
-                "height": 6
+                "x": 0.0,
+                "y": 10.0,
+                "width": 14.0,
+                "height": 4.0
+            }
+        },
+        {
+            "chart_id": "chart8",
+            "title": "Sales by Merchant",
+            "description": "Total sales amount by merchant",
+            "chart_type": "bar",
+            "priority_level": 8,
+            "position": {
+                "x": 14.0,
+                "y": 10.0,
+                "width": 10.0,
+                "height": 4.0
+            }
+        },
+        {
+            "chart_id": "chart9",
+            "title": "Sales by Payment Method",
+            "description": "Total sales amount by payment method",
+            "chart_type": "bar",
+            "priority_level": 9,
+            "position": {
+                "x": 5.0,
+                "y": 14.0,
+                "width": 10.0,
+                "height": 4.0
             }
         }
     ]
