@@ -233,8 +233,9 @@ class DashboardEng:
             Also, following this rules: {rules}, then {additional_rules}.
             If possible, suggest at least 6 charts or More."""
 
-        dtem2 = """Given the chart options and its suggestion: {current_layout}, suggest a real dashboard layout.
-            Please adjust the size and the position of the charts following this rules: {rules}"""
+        dtem2 = """Given the chart options and its suggestion: {current_layout}, 
+            Suggest a real dashboard layout. Please adjust the size and 
+            the position of the charts following this rules: {rules}"""
 
         self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
             [
@@ -302,21 +303,26 @@ class DashboardEng:
 
         if output is None:
             return {"chart_options": []}
-        else:
-            chart_options = json.loads(output.json())
+
+        chart_options = json.loads(output.json())
 
         # input_json = {
         #     "current_layout": chart_options,
         #     "rules": """
-        #         Utilize Masonry-style layout, placed next to each other without intersecting or overlap.
-        #         numberOnly charts always together. lining horizontally on the top or lining vertically on the left or right side.
-        #         Here the example size of the charts (it is allowed to adjust the size without violating the example ratio), it is allowed to use maximum 2 floating points size:
-        #         numberOnly/textOnly: 4x3.1, 5.21x3, 6.1x3.2, 7.1x3.3, 6.1x4.3, 7.1x4.2, 8.1x4.2, etc.
-        #         bar/line/maps: 11.1x6.2, 12.1x6.1, 13.2x6.1, 14x6.2, 15x6, 12x7, 13x7, 14x7, 15.1x7.1, 16x7, 13x8, 14x8, 15x8.3, 16x8.2, 17x8, etc.
-        #         table: 7.3x8, 7.03x9.1, 7x10, 8x9, 8x10, 8x11, 8x12, 9x10.1, 9x11, 9x12, etc.
-        #         The whole dashboard is a grid with 29 columns and 18 rows.
-        #         adjust, reduce or stretch the size of the charts to fit the whole dashboard without overlapping.
-        #         It is allowed to not show all charts. Minimum 2 numberOnly charts and minimum total charts is 6.
+        # Utilize Masonry-style layout, placed next to each other without intersecting or overlap.
+        # numberOnly charts always together. lining horizontally on the top or lining vertically
+        # on the left or right side.
+        # Here the example size of the charts (it is allowed to adjust the size without violating
+        # the example ratio), it is allowed to use maximum 2 floating points size:
+        # numberOnly/textOnly: 4x3.1, 5.21x3, 6.1x3.2, 7.1x3.3, 6.1x4.3, 7.1x4.2, 8.1x4.2, etc.
+        # bar/line/maps: 11.1x6.2, 12.1x6.1, 13.2x6.1, 14x6.2, 15x6, 12x7, 13x7, 14x7
+        # , 15.1x7.1, 16x7, 13x8, 14x8, 15x8.3, 16x8.2, 17x8, etc.
+        # table: 7.3x8, 7.03x9.1, 7x10, 8x9, 8x10, 8x11, 8x12, 9x10.1, 9x11, 9x12, etc.
+        # The whole dashboard is a grid with 29 columns and 18 rows.
+        # adjust, reduce or stretch the size of the charts to fit the whole dashboard
+        # without overlapping.
+        # It is allowed to not show all charts. Minimum 2 numberOnly charts
+        # and minimum total charts is 6.
         #     """,
         # }
         input_json = {
