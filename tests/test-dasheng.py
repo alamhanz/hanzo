@@ -4,30 +4,9 @@ import sys
 from dotenv import load_dotenv
 
 sys.path.append("../hanzo/")
-from hanzo import DashboardEng, IndoCityExpert, Talk, Vectordb
+from hanzo import DashboardEng
 
 load_dotenv()
-# ## Create VDB
-# # vdb = vectordb(model="BAAI/bge-large-en-v1.5")
-# vdb = Vectordb(
-#     model="BAAI/bge-large-en-v1.5",
-#     file="../datakoen/app/default/my_profile.txt",
-#     db_path="../datakoen/app/default/about_me/",
-# )
-# # vdb.create(chunk_size=200, chunk_overlap=80)
-# vdb.load()
-
-# ## Talk
-# ## Not all model in together enable to return json (https://docs.together.ai/docs/json-mode)
-# hanzo_talk = Talk(
-#     vdb.db,
-#     model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
-#     max_token=800,
-#     context_size=5,
-# )
-# print(hanzo_talk.invoking(text_input="where is alam lives?", verbose=True))
-# # hanzo_talk.streaming()
-
 
 ## Dashboard Engineer
 dashboard_engineer = DashboardEng(model="deepseek-ai/DeepSeek-V3")
@@ -51,25 +30,3 @@ with open("tmp.json", "w") as fp:
     json.dump(output, fp, indent=4)
 
 print(output)
-
-
-# ## City Expert
-# city_expert = IndoCityExpert()
-# input_query = {
-#     "cities_list": ",".join(
-#         [
-#             "Jakrta",
-#             "Sulawesi Utra",
-#             "kaltim",
-#             "sumut",
-#             "kalteng",
-#             "D.I Yogyakarta",
-#             "Purwakart",
-#             "Subng",
-#             "sukabuma",
-#             "taskmalaya",
-#         ]
-#     ),
-# }
-# output = city_expert.normalized_cities(**input_query)
-# print(output)

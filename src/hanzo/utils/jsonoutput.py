@@ -40,7 +40,11 @@ class DashboardDetail(BaseModel):
 
 
 class DashboardLayoutOutput(BaseModel):
-    """RAG Styles"""
+    """_summary_
+
+    Args:
+        BaseModel (_type_): _description_
+    """
 
     chart_position: List[DashboardDetail] = Field(
         description="List of charts positions in grid."
@@ -62,7 +66,11 @@ class ChartDetail(BaseModel):
 
 
 class ChartOptionsOutput(BaseModel):
-    """RAG Styles"""
+    """_summary_
+
+    Args:
+        BaseModel (_type_): _description_
+    """
 
     chart_options: List[ChartDetail] = Field(
         description="List of charts contexts with detailed information"
@@ -77,7 +85,11 @@ class CityList(BaseModel):
 
 
 class IndoCityOutput(BaseModel):
-    """RAG Styles"""
+    """_summary_
+
+    Args:
+        BaseModel (_type_): _description_
+    """
 
     cities: List[CityList] = Field(
         description="List of closest real cities name in Indonesia"
