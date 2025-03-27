@@ -233,7 +233,7 @@ class DashboardEng:
             Also, following this rules: {rules}, then {additional_rules}.
             If possible, suggest at least 6 charts or More."""
 
-        dtem2 = """Given the chart options and its suggestion: {current_layout}, 
+        dtem2 = """Given the chart options and its suggestion: {current_layout},
             Suggest a real dashboard layout. Please adjust the size and 
             the position of the charts following this rules: {rules}"""
 
