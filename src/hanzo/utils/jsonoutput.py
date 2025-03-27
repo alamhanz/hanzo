@@ -21,26 +21,51 @@ class Ragoutput(BaseModel):
     )
 
 
+class ChartPosition(BaseModel):
+    """position of the chart"""
+
+    x: float = Field(description="Starting column (0-based index)")
+    y: float = Field(description="Starting row (0-based index)")
+    width: float = Field(description="x-axis size of the chart spans")
+    height: float = Field(description="y-axis size of the chart spans")
+
+
 class DashboardDetail(BaseModel):
     """Details of each dashboard context"""
 
-    name: str = Field(
-        description="The suggested name of the plot. make the name easy to understand."
-    )
-    plot_type: str = Field(description="The plot suggestion type")
-    plot_explaination: str = Field(
-        description="The plot description in 3 sentences max which explain what should be put in each axis."
+    chart_id: str = Field(description="unique id of the chart")
+    position: ChartPosition = Field(
+        description="position of the chart. It could be None if the chart is not choosen to be shown. Make position None if the chart is not shown"
     )
 
 
-class DashboardSuggestOutput(BaseModel):
+class DashboardLayoutOutput(BaseModel):
     """RAG Styles"""
 
-    top_layer: List[DashboardDetail] = Field(
-        description="List of plots contexts with detailed information that located on the top"
+    chart_position: List[DashboardDetail] = Field(
+        description="List of charts positions in grid."
     )
-    bottom_layer: List[DashboardDetail] = Field(
-        description="List of plots contexts with detailed information that located on the bottom"
+
+
+class ChartDetail(BaseModel):
+    """Details of each dashboard context"""
+
+    chart_id: str = Field(description="unique id of the chart")
+    title: str = Field(description="title of the chart")
+    description: str = Field(description="chart description")
+    chart_type: str = Field(
+        description="type of the chart. The types is either 'bar', 'line', 'numberOnly', 'textOnly', 'table', or 'maps'. No other types are allowed. Dont use maps if no longitude and latitude provided"
+    )
+    priority_level: int = Field(
+        description="priority of the chart. The priority is between 1 to 10. The lower the number, the higher the priority. It is allowed to have same priority level"
+    )
+
+
+class ChartOptionsOutput(BaseModel):
+    """RAG Styles"""
+
+    chart_options: List[ChartDetail] = Field(
+        description="List of charts contexts with detailed information"
     )
 
 

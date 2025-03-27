@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(30, 40px);
+      grid-template-rows: repeat(30, 40px);
+      gap: 10px;
+      width: auto;
+      position: relative;
+    }
+    .chart {
+      padding: 20px;
+      border-radius: 8px;
+      color: white;
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: absolute;
+      box-sizing: border-box;
+      border: 4px solid white;
+    }
+    .bar { background-color: #3498db; }
+    .line { background-color: #e74c3c; }
+    .numberOnly { background-color: #2ecc71; }
+    .textOnly { background-color: #9b59b6; }
+    .table { background-color: #f1c40f; color: black; }
+    .maps { background-color: #e67e22; }
+    .grid-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: none;
+      background-size: 40px 40px;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard Example</h1>
+  <div class="dashboard" id="dashboard">
+    <div class="grid-lines" id="gridLines"></div>
+  </div>
+
+  <script>
+    const enableGridLines = true; // Set to false to hide grid lines
+    const gridSize = 40; // Grid cell size in pixels
+
+    async function generateDashboard() {
+      try {
+        const response = await fetch('tmp.json');
+        const data = await response.json();
+        const dashboard = document.getElementById('dashboard');
+        const gridLines = document.getElementById('gridLines');
+        
+        if (enableGridLines) {
+          gridLines.style.display = 'block';
+        }
+
+        const chartPositions = data.chart_options;
+
+        chartPositions.forEach(chart => {
+          const chartElement = document.createElement('div');
+          chartElement.classList.add('chart', chart.chart_type);
+          chartElement.textContent = `${chart.title} (${chart.chart_type})`;
+          
+          // Ensure the exact coverage of grid units
+          chartElement.style.width = `${chart.position.width * gridSize}px`;
+          chartElement.style.height = `${chart.position.height * gridSize}px`;
+          chartElement.style.left = `${(chart.position.x+4) * gridSize}px`;
+          chartElement.style.top = `${(chart.position.y+1) * gridSize}px`;
+          
+          dashboard.appendChild(chartElement);
+        });
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+
+    generateDashboard();
+  </script>
+</body>
+</html>
