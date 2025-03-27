@@ -30,7 +30,7 @@ load_dotenv()
 
 
 ## Dashboard Engineer
-dashboard_engineer = DashboardEng()
+dashboard_engineer = DashboardEng(model="deepseek-ai/DeepSeek-V3")
 input_query = {
     "csv_input": """
 This dataset contains information about product sales in a retail store.

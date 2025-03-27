@@ -231,10 +231,10 @@ class DashboardEng:
         dtem = """Given the sample of a table: {table},
             Suggest charts in the dashboard with this goal: {context}.
             Also, following this rules: {rules}, then {additional_rules}.
-            If possible, suggest at least 7 charts or More."""
+            If possible, suggest at least 6 charts or More."""
 
         dtem2 = """Given the chart options and its suggestion: {current_layout}, suggest a real dashboard layout.
-            Please adjust the size and location following this rules: {rules}"""
+            Please adjust the size and the position of the charts following this rules: {rules}"""
 
         self.dash_suggest_prompt = ChatPromptTemplate.from_messages(
             [
@@ -289,11 +289,21 @@ class DashboardEng:
                 Keep It Simple: Presenting only the essential metrics and visualizations that align with the dashboard's goal.
                 Choose the right chart type (e.g., bar charts for comparisons, line graphs for trends).
                 prioritize the most relevant charts by the goal of the dashboard.
+                make at least 3 numberOnly charts OR not at all.
             """,
         }
 
-        output = self.chart_suggest_chain.invoke(input_query)
-        chart_options = json.loads(output.json())
+        output = None
+        trial = 0
+        while output is None and trial <= 3:
+            logger.info("invoking chart suggest chain. Trial %s", trial)
+            output = self.chart_suggest_chain.invoke(input_query)
+            trial += 1
+
+        if output is None:
+            return {"chart_options": []}
+        else:
+            chart_options = json.loads(output.json())
 
         # input_json = {
         #     "current_layout": chart_options,
@@ -312,12 +322,11 @@ class DashboardEng:
         input_json = {
             "current_layout": chart_options,
             "rules": """
-                The whole dashboard is a grid with 29 columns and 18 rows, make sure all dashboard grids is covered.
-                Put all charts to the dashboard. Its okay to put wide charts.
-                Make sure use smaller size for less priority charts (1 means the highest priority).
+                The whole dashboard is a grid with 18 rows and 30 columns, make sure all dashboard grids is covered.
                 Utilize Masonry-style layout, placed next to each other without intersecting or overlap.
                 numberOnly charts always together. lining horizontally on the top or lining vertically on the left or right side.
-                Left no empty space.
+                Put all charts to the dashboard. Its okay to put wide charts.
+                Use float number to adjust the size and position of the charts.
             """,
         }
 

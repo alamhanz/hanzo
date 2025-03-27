@@ -65,7 +65,7 @@ class ChartOptionsOutput(BaseModel):
     """RAG Styles"""
 
     chart_options: List[ChartDetail] = Field(
-        description="List of charts contexts with detailed information that located on the grid"
+        description="List of charts contexts with detailed information"
     )
 
 
